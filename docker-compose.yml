@@ -1,0 +1,38 @@
+# docker-compose.yml
+version: '3.8' # O una versión más reciente, si prefieres
+
+services:
+  firebase-dev:
+    # Construye la imagen usando el Dockerfile en el directorio actual
+    build: .
+    # Mapea el directorio actual (donde está docker-compose.yml)
+    # al directorio /app dentro del contenedor.
+    # Esto asegura que los cambios en tu código local se reflejen.
+    volumes:
+      - .:/app
+    # Mapea los puertos del contenedor a tu máquina local.
+    # Así podrás acceder a los emuladores desde tu navegador/Postman localmente.
+      - C:/Users/B O K I/.config/configstore:/root/.config/configstor # <-----!IMPORTANTE! Mapea las credenciales del host cada quien debe buscar su configstor dento del dico c y cambiar la dirreccion aqui
+    ports:
+      - "5001:5001" # Functions Emulator
+      - "4000:4000" # Emulator UI
+      - "8080:8080" # Firestore Emulator
+      - "9099:9099" # Authentication Emulator (si usas)
+      - "9005:9005" # Para firebase login
+      # Añade más puertos si usas otros emuladores (e.g., 9000 para Realtime DB, 9199 para Storage)
+    # Abre una shell interactiva por defecto cuando el contenedor se inicia
+    # (si no se le pasa otro comando).
+    stdin_open: true # Mantener stdin abierto para la interacción
+    tty: true        # Asignar una TTY
+    # Permite al contenedor acceder a las credenciales de Firebase que se almacenan
+    # en el sistema de archivos del usuario. IMPORTANTE para firebase login.
+    # Ajusta esta ruta a la ubicación de tus credenciales en tu SO local.
+    # Para Windows: C:\Users\<YourUser>\.config\configstore (ajusta la ruta de tu perfil)
+    # Para Linux/macOS: ~/.config/configstore
+    # --- AÑADE ESTA SECCIÓN ---
+    environment:
+      # Le dice al Firebase CLI dónde encontrar el binario de Python dentro del venv
+      # Lo más común es que 'python3.11 -m venv venv' cree un symlink 'python3' o 'python'
+      # Intentaremos primero con 'python3' que suele ser el estándar.
+      - PYTHON_BIN=/app/functions/venv/bin/python3
+    # --- FIN DE LA SECCIÓN AÑADIDA ---

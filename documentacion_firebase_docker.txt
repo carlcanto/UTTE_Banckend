@@ -1,0 +1,31 @@
+Comandos para levantar un proyecto Firebase Functions cloud desde el CMD
+Abri proyecto en VSCODE
+1. npm install -g firebase-tools (sino está instalado/primera vez)
+2. firebase login
+3. firebase init functions
+	3.1 Si quieres proceder (yes)
+	3.2 No instalar las dependencias del lenguaje seleccionado (No)
+4. Entrar a la carpeta functions: cd functions
+5. Activar el entorno virtual:
+	5.1 q 
+6. python -m pip install --upgrade pip
+7. npm install firebase-admin firebase-functions
+8. pip install firebase-admin
+9. pip install firebase_functions
+10. pip install Flask
+11. Modificar el json:
+	11. Para programar
+12. Iniciar en emulador Firebase suit (cd carpeta raiz)
+	12.1 firebase emulators:start --only functions (solo las funciones)
+	12.2 todo completo: firebase emulators:start
+
+13. Hacer deploy (consultar con GEMINI, para subir a la nube).
+Observacion: todos los comandos que inician con firebase van desde la carpeta RAIZ
+
+
+en la bash del contenedor:
+1. para saber el id del contenedor 'docker ps'.
+2. para entrar al contenedor 'docker exec -it <id> bash'.
+3. para logiarse een firebase desde le contenedor 'firebase login'.
+	3.1 te dara una url para validar tu cuenta de acceso. 
+4. iniciar el emulador 'firebase emulators:start' esto iniciara todos los sevicios de firebase localmente. dandote una url donde muestra endpoint.

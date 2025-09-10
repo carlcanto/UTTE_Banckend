@@ -1,0 +1,5 @@
+services:
+  firebase-dev:
+    command: bash
+    stdin_open: true
+    tty: true

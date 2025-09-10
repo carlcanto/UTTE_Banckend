@@ -1,0 +1,48 @@
+# 👇 Carpetas de entornos virtuales
+venv/
+.venv/
+env/
+ENV/
+
+# 👇 Archivos de compilación/caché de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+*.log
+
+# 👇 Archivos de dependencias locales
+Pipfile
+Pipfile.lock
+poetry.lock
+
+# 👇 Archivos de sistema/IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# 👇 Archivos y carpetas de Firebase que no quieras subir al contenedor
+.firebase/
+.firebaserc
+firebase-debug.log
+firestore-debug.log
+storage-debug.log
+
+# 👇 Archivos de control de git
+.git
+.gitignore
+.gitattributes
+
+# 👇 Archivos temporales
+*.tmp
+*.bak
+*.old
+
+# 👇 Archivos de Docker
+docker-compose.override.yml
+.dockerignore

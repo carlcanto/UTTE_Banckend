@@ -1,0 +1,13 @@
+connectorId: example
+generate:
+  javascriptSdk:
+    - outputDir: ..\..\UTTE-VERAGUAS\src\dataconnect-generated
+      package: "@dataconnect/generated"
+      packageJsonDir: ..\..\UTTE-VERAGUAS
+      react: false
+      angular: false
+    - outputDir: ..\..\UTTE-VERAGUAS\utte.veraguas\src\dataconnect-generated
+      package: "@dataconnect/generated"
+      packageJsonDir: ..\..\UTTE-VERAGUAS\utte.veraguas
+      react: false
+      angular: false

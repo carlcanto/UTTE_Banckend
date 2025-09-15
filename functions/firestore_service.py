@@ -1,48 +1,88 @@
-import os
-import firebase_admin
-from firebase_admin import credentials, firestore as admin_firestore
-from google.cloud import firestore as gcloud_firestore
+import bcrypt
+from flask import jsonify
+from .firebase_config import get_db 
 
-# Inicializa Firebase solo si no está ya inicializado
-if not firebase_admin._apps and not os.getenv("FIRESTORE_EMULATOR_HOST"):
-    cred = credentials.Certificate(
-        os.path.join(os.path.dirname(__file__), "..", "keys", "utte-471220-427c3184644f.json")
-    )
-    firebase_admin.initialize_app(cred)
 
-def get_db():
+def login(data):
     """
-    Devuelve la conexión a Firestore.
-    - Si está el emulador activo -> conecta con google.cloud.firestore
-    - Si no -> conecta a Firestore en la nube con firebase_admin
+    Valida usuario contra Firestore.
     """
-    if os.getenv("FIRESTORE_EMULATOR_HOST"):
-        print("🔥 Conectado al Firestore Emulator:", os.getenv("FIRESTORE_EMULATOR_HOST"))
-        return gcloud_firestore.Client(project="utte-471220")  # tu project-id
-    else:
-        print("☁️ Conectado a Firestore en la nube")
-        return admin_firestore.client()
-
-
-def add_user(cedula, password):
     db = get_db()
     users_ref = db.collection("users")
-    user_doc = users_ref.document(cedula)
-    user_doc.set({
-        "cedula": cedula,
-        "password": password
-    })
-    return {"message": "Usuario agregado con éxito", "cedula": cedula}
 
+    cedula = data.get("cedula")
+    password = data.get("password")
 
-def get_user(cedula, password):
-    db = get_db()
-    user_ref = db.collection("users").document(cedula).get()
-    if user_ref.exists:
-        user = user_ref.to_dict()
-        if user["password"] == password:
-            return {"status": "success", "user": user}
-        else:
-            return {"status": "error", "message": "Contraseña incorrecta"}
-    else:
+    if not cedula or not password:
+        return {"status": "error", "message": "Faltan credenciales"}
+
+    # Buscar usuario por cédula (usamos la cédula como ID del documento)
+    user_doc = users_ref.document(cedula).get()
+
+    if not user_doc.exists:
         return {"status": "error", "message": "Usuario no encontrado"}
+
+    user_data = user_doc.to_dict()
+    stored_hash = user_data.get("password")
+
+    # Comparar contraseñas
+    if not bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8")):
+        return {"status": "error", "message": "Contraseña incorrecta"}
+
+    # Si todo bien
+    return {
+        "status": "success",
+        "message": "Login exitoso",
+        "user": {
+            "cedula": user_data.get("cedula"),
+            "nombre": user_data.get("nombre"),
+            "email": user_data.get("email"),
+        }
+    }
+
+
+def add_user(data):
+    """
+    Recibe un diccionario con los datos del usuario y lo guarda en Firestore.
+    """
+    db = get_db()
+    users_ref = db.collection("users")
+
+    cedula = data.get("cedula")
+    password = data.get("password")
+    nombre = data.get("nombre")
+    email = data.get("email")
+
+    # Validaciones
+    if not cedula or not password or not nombre or not email:
+        return {"status": "error", "message": "Faltan campos obligatorios"}
+
+    # Revisar si ya existe un usuario con esa cédula
+    existing_user = users_ref.document(cedula).get()
+    if existing_user.exists:
+        return {"status": "error", "message": "El usuario ya existe"}
+
+    # Hashear la contraseña
+    hashed_pw = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+
+    # Guardar en Firestore (usamos cedula como ID del documento)
+    users_ref.document(cedula).set({
+        "cedula": cedula,
+        "password": hashed_pw.decode("utf-8"),  # importante convertir a str
+        "nombre": nombre,
+        "email": email
+    })
+
+    return {"status": "success", "message": "Usuario creado correctamente"}
+
+def delete_all_users():
+    db = get_db()
+    users_ref = db.collection("users")
+    docs = users_ref.stream()
+
+    deleted = 0
+    for doc in docs:
+        doc.reference.delete()
+        deleted += 1
+
+    return {"message": f"Se eliminaron {deleted} usuarios"}

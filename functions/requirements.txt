@@ -3,3 +3,5 @@ firebase-functions==0.1.2
 firebase_admin==7.1.0
 flask-cors
 google-cloud-firestore
+bcrypt==4.3.0
+dotenv==0.9.9

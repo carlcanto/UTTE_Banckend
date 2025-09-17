@@ -1,8 +1,10 @@
 import os
+import sys
 import firebase_admin
 from firebase_admin import credentials, firestore as admin_firestore
 from google.cloud import firestore as gcloud_firestore
 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 def get_db():
     """
     Devuelve la conexión a Firestore.
